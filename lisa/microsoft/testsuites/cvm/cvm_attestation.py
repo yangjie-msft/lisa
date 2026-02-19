@@ -48,9 +48,9 @@ class AzureCVMAttestationTestSuite(TestSuite):
                 )
             )
 
-        if node.tools[Lscpu].get_cpu_type() != CpuType.AMD:
+        if node.tools[Lscpu].get_cpu_type() != CpuType.AMD and node.tools[Lscpu].get_cpu_type() != CpuType.Intel:
             raise SkippedException(
-                "CVM attestation report supports only SEV-SNP (AMD) CPU."
+                "CVM attestation report supports only SEV-SNP (AMD) CPU or Intel TDX CPU."
             )
 
     @TestCaseMetadata(
@@ -60,8 +60,8 @@ class AzureCVMAttestationTestSuite(TestSuite):
         """,
         priority=3,
         requirement=simple_requirement(
-            supported_features=[CvmEnabled()],
-            supported_platform_type=[AZURE],
+        #    supported_features=[CvmEnabled()],
+        #    supported_platform_type=[AZURE],
         ),
     )
     def verify_azure_cvm_attestation_report(
@@ -75,9 +75,15 @@ class AzureCVMAttestationTestSuite(TestSuite):
     ) -> None:
         if isinstance(node.os, Ubuntu):
             cvm_tests: AzureCVMAttestationTests = node.tools[AzureCVMAttestationTests]
+            if node.tools[Lscpu].get_cpu_type() == CpuType.AMD:
+                config_file = "config_snp_guest.json"
+            else:
+                config_file = "config_tdx_guest.json"
+
             cvm_tests.run_cvm_attestation(
                 result,
                 environment,
+                config_file,
                 log_path,
             )
         elif isinstance(node.os, CBLMariner):
