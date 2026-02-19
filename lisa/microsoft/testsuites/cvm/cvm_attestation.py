@@ -60,8 +60,8 @@ class AzureCVMAttestationTestSuite(TestSuite):
         """,
         priority=3,
         requirement=simple_requirement(
-        #    supported_features=[CvmEnabled()],
-        #    supported_platform_type=[AZURE],
+            supported_features=[CvmEnabled()],
+            supported_platform_type=[AZURE],
         ),
     )
     def verify_azure_cvm_attestation_report(
