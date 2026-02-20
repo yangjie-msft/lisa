@@ -1,17 +1,14 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-import json
-import os
 from pathlib import Path, PurePath
-from typing import Any, Dict, List, Type, cast
+from typing import Any, Dict, List, Type
 
-import jwt
 from assertpy.assertpy import assert_that
 
 from lisa import Environment
 from lisa.executable import Tool
 from lisa.features import SerialConsole
-from lisa.operating_system import CBLMariner, Posix, Ubuntu
+from lisa.operating_system import CBLMariner, Ubuntu
 from lisa.testsuite import TestResult
 from lisa.tools import Cargo, Dmesg, Echo, Git, Make, Mkdir
 from lisa.util import UnsupportedDistroException
@@ -55,14 +52,14 @@ class AzureCVMAttestationTests(Tool):
 
         output: str = command.stdout
 
-        is_valid = f"Attested Platform Successfully" in output
+        is_valid = "Attested Platform Successfully" in output
 
         assert_that(
-                is_valid,
-                "Invalid attestation signature",
-            ).is_true()
-        self._save_attestation_report(output, log_path=log_path)
+            is_valid,
+            "Invalid attestation signature",
+        ).is_true()
 
+        self._save_attestation_report(output, log_path=log_path)
         failure_msg = "CVM guest attestation report generation failed"
 
         command_option = f"--c {config_path} --t GUEST"
@@ -78,18 +75,13 @@ class AzureCVMAttestationTests(Tool):
 
         output = command.stdout
 
-        is_valid = f"Attested Guest Successfully" in output
+        is_valid = "Attested Guest Successfully" in output
 
         assert_that(
-                is_valid,
-                "Invalid attestation signature",
-            ).is_true()
+            is_valid,
+            "Invalid attestation signature",
+        ).is_true()
         self._save_attestation_report(output, log_path=log_path)
-
-    def _save_attestation_report(self, output: str, log_path: Path) -> None:
-        report_path = log_path / "cvm_attestation_report.txt"
-        with open(str(report_path), "w") as f:
-            f.write(output)
 
     def _initialize(self, *args: Any, **kwargs: Any) -> None:
         if not isinstance(self.node.os, Ubuntu):
@@ -127,6 +119,7 @@ class AzureCVMAttestationTests(Tool):
         report_path = log_path / "cvm_test_report_combined.txt"
         with open(str(report_path), "a+") as f:
             f.write(output)
+
 
 class SnpGuest(Tool):
     _snpguest_repo = "https://github.com/virtee/snpguest"
